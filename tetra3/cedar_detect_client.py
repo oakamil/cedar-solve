@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 import logging
+import os
 import subprocess
 import time
 from pathlib import Path
@@ -49,7 +50,10 @@ class CedarDetectClient:
             raise ValueError(f"The cedar-detect-server binary could not be found at '{self._binary_path}'.")
         self._port = port
 
-        self._subprocess = subprocess.Popen([self._binary_path, '--port', str(self._port)])
+        my_env = os.environ.copy()
+        my_env["RUST_BACKTRACE"] = "1"
+        self._subprocess = subprocess.Popen([self._binary_path, '--port', str(self._port)],
+                                            env=my_env)
         # Will initialize on first use.
         self._stub = None
         self._shmem = None
